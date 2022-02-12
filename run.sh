@@ -224,5 +224,5 @@ else
 	/quip/vendor/bin/drush -y cache-rebuild	
 	/quip/vendor/bin/drush -y user:cancel archon
 
+fi
 while true; do sleep 1000; done
-
