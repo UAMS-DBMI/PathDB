@@ -30,7 +30,6 @@ COPY images/ /quip/web/images/
 COPY settings.php /build
 COPY mysql.tgz /build
 # set permissions correctly for apache demon access
-RUN chown -R apache:apache /quip
 # adjust location of Drupal-supporting MySQL database files
 RUN sed -i 's/datadir=\/var\/lib\/mysql/datadir=\/data\/pathdb\/mysql/g' /etc/my.cnf
 # increase php file upload sizes and posts
@@ -40,15 +39,13 @@ RUN sed -i 's/;upload_tmp_dir =/upload_tmp_dir = "\/data\/tmp"/g' /etc/php.ini
 RUN sed -i 's/sys_temp_dir =/sys_temp_dir = "\/data\/tmp"/g' /etc/php.ini
 # set up Drupal private file area
 RUN mkdir -p /data/pathdb/files
-RUN chown -R apache:apache /data/pathdb/files
-RUN chmod -R 775 /data/pathdb/files
 
 # create self-signed digital keys for JWT
 WORKDIR /etc/httpd/conf
 RUN openssl req -subj '/CN=www.mydom.com/O=My Company Name LTD./C=US' -x509 -nodes -newkey rsa:2048 -keyout quip.key -out quip.crt
 
 # copy over Docker initialization scripts
-EXPOSE 80
+EXPOSE 8080
 COPY run.sh /root/run.sh
 COPY savepathdb /root/savepathdb
 COPY mysql.tgz /build
@@ -68,4 +65,10 @@ RUN if [ -z ${featureMap} ]; then git clone https://github.com/SBU-BMI/FeatureMa
 RUN rm /etc/httpd/conf.d/ssl.conf
 RUN chmod 755 /root/run.sh
 RUN yum update -y && yum clean all
+COPY --chown=apache:root config2 /config
+COPY --chown=apache:root config2/pathdb /quip/web/sites/default
+COPY --chown=apache:root jwt_keys /keys
+COPY --chown=apache:root data /data
+RUN chgrp -R root /var/run/mariadb /var/run/httpd /var/lib/mysql /etc/httpd/logs
+RUN chmod -R g+w /config /keys /data /quip /build /var/run/mariadb /var/run/httpd /var/lib/mysql /etc/httpd/logs
 CMD ["sh", "/root/run.sh"]

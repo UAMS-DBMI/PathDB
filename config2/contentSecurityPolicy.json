@@ -1,0 +1,51 @@
+{
+  "defaultSrc": [
+  "'self'"
+],
+"scriptSrc": [
+  "'self'",
+  "'unsafe-inline'",
+  "'unsafe-eval'",
+  "code.jquery.com",
+  "apis.google.com",
+  "ajax.googleapis.com",
+  "cdn.jsdelivr.net",
+  "cdnjs.cloudflare.com",
+  "unpkg.com",
+  "stackpath.bootstrapcdn.com",
+  "openseadragon.github.io",
+  "cdn.datatables.net",
+  "maxcdn.bootstrapcdn.com"
+],
+"styleSrc": [
+  "'self'",
+  "'unsafe-inline'",
+  "fonts.googleapis.com",
+  "use.fontawesome.com",
+  "cdnjs.cloudflare.com",
+  "stackpath.bootstrapcdn.com",
+  "cdn.jsdelivr.net",
+  "code.jquery.com",
+  "unpkg.com",
+  "cdn.datatables.net",
+  "maxcdn.bootstrapcdn.com"
+],
+"fontSrc": [
+  "'self'",
+  "use.fontawesome.com",
+  "fonts.gstatic.com",
+  "cdnjs.cloudflare.com",
+  "maxcdn.bootstrapcdn.com"
+],
+"imgSrc": [
+  "'self'",
+  "data:",
+  "cdn.datatables.net",
+  "code.jquery.com"
+],
+"frameSrc": [
+ "'self'",
+ "accounts.google.com",
+ "www.youtube-nocookie.com"
+]
+}

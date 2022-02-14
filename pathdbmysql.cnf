@@ -1,6 +1,5 @@
 [mysqld]
 datadir=/data/pathdb/mysql
-user=mysql
 skip-name-resolve
 symbolic-links=0
 max_connections = 150
