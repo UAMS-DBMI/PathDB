@@ -72,6 +72,9 @@ do
 	sleep 3
 done
 echo "starting httpd"
+if [ -d /config/map ]; then
+	cp /config/map/httpd.conf /config/httpd.conf
+fi
 httpd -f /config/httpd.conf
 if [ ! -f /data/pathdb/init ]; then
 	echo "first run, seting up environment"
