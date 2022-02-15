@@ -52,25 +52,29 @@ if [ ! -d /data/pathdb/logs ]; then
         mkdir -p /data/pathdb/logs
 fi
 if [ ! -d /data/pathdb/mysql ]; then
+	echo "first run, setting up database"
 	mysql_install_db --force --defaults-file=/config/pathdbmysql.cnf --user=$(id -u)
 	/usr/bin/mysqld_safe --defaults-file=/config/pathdbmysql.cnf --user=$(id -u) &
-        until mysqladmin status
+        until mysqladmin ping --silent
         do
                 sleep 3
         done
 	cd /build
         tar xvfz mysql.tgz
         mysql -u root -e "create database QuIP"
-        mysql -u root -e "grant all privileges on QuIP.* to ''@'localhost"
+        mysql -u root -e "grant all privileges on QuIP.* to ''@'localhost'"
         mysql QuIP < mysql
 fi
+echo "starting database"
 /usr/bin/mysqld_safe --defaults-file=/config/pathdbmysql.cnf &
-until mysqladmin status
+until mysqladmin ping --silent
 do
 	sleep 3
 done
+echo "starting httpd"
 httpd -f /config/httpd.conf
-if [ ! -d /quip/config-local ]; then
+if [ ! -f /data/pathdb/init ]; then
+	echo "first run, seting up environment"
 	cd /quip/web
 	/quip/vendor/bin/drush -y theme:enable bootstrap
 	/quip/vendor/bin/drush -y pm:enable css_editor
@@ -112,9 +116,9 @@ if [ ! -d /quip/config-local ]; then
 	/quip/vendor/bin/drush -y config:import --partial --source /quip/config-update/
 	/quip/vendor/bin/drush -y pm:enable moderated_content_bulk_publish
 	/quip/vendor/bin/drush -y updatedb
-	/quip/vendor/bin/drush -y cache-rebuild	
 	/quip/vendor/bin/drush -y user:cancel archon
-	/quip/vendor/bin/drush -y config:export --destination /quip/config-local
+	touch /data/pathdb/init
 fi
+/quip/vendor/bin/drush -y cache-rebuild	
 echo "Running"
 while true; do sleep 1000; done

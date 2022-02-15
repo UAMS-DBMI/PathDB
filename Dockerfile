@@ -65,10 +65,10 @@ RUN if [ -z ${featureMap} ]; then git clone https://github.com/SBU-BMI/FeatureMa
 RUN rm /etc/httpd/conf.d/ssl.conf
 RUN chmod 755 /root/run.sh
 RUN yum update -y && yum clean all
-COPY --chown=apache:root config2 /config
-COPY --chown=apache:root config2/pathdb /quip/web/sites/default
-COPY --chown=apache:root jwt_keys /keys
-COPY --chown=apache:root data /data
+COPY --chown=root:root config2 /config
+COPY --chown=root:root config2/pathdb /quip/web/sites/default
+COPY --chown=root:root jwt_keys /keys
+COPY --chown=root:root data /data
 RUN chgrp -R root /var/run/mariadb /var/run/httpd /var/lib/mysql /etc/httpd/logs
 RUN chmod -R g+w /config /keys /data /quip /build /var/run/mariadb /var/run/httpd /var/lib/mysql /etc/httpd/logs
 CMD ["sh", "/root/run.sh"]
