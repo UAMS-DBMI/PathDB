@@ -52,9 +52,15 @@ if [ ! -d /data/pathdb/logs ]; then
         mkdir -p /data/pathdb/logs
 fi
 if [ ! -d /data/pathdb/mysql ]; then
-	echo "first run, setting up database"
-	mysql_install_db --force --defaults-file=/config/pathdbmysql.cnf --user=$(id -u)
-	/usr/bin/mysqld_safe --defaults-file=/config/pathdbmysql.cnf --user=$(id -u) &
+	if [ $(id -u) -eq 0 ]; then
+		echo "first run, setting up database, as root"
+		mysql_install_db --force --defaults-file=/config/pathdbmysql.cnf --user=root
+		/usr/bin/mysqld_safe --defaults-file=/config/pathdbmysql.cnf --user=root &
+	else
+		echo "first run, setting up database, as self"
+		mysql_install_db --force --defaults-file=/config/pathdbmysql.cnf --user=$(id -u)
+		/usr/bin/mysqld_safe --defaults-file=/config/pathdbmysql.cnf --user=$(id -u) &
+	fi
         until mysqladmin ping --silent
         do
                 sleep 3
@@ -65,14 +71,20 @@ if [ ! -d /data/pathdb/mysql ]; then
         mysql -u root -e "grant all privileges on QuIP.* to ''@'localhost'"
         mysql QuIP < mysql
 fi
-echo "starting database"
-/usr/bin/mysqld_safe --defaults-file=/config/pathdbmysql.cnf &
+if [ $(id -u) -eq 0 ]; then
+	echo "starting database, as self"
+	/usr/bin/mysqld_safe --defaults-file=/config/pathdbmysql.cnf --user=$(id -u) &
+else
+	echo "starting database, as root"
+	/usr/bin/mysqld_safe --defaults-file=/config/pathdbmysql.cnf --user=root &
+fi
 until mysqladmin ping --silent
 do
 	sleep 3
 done
 echo "starting httpd"
 if [ -d /config/map ]; then
+	echo "copying config mapped httpd.conf"
 	cp /config/map/httpd.conf /config/httpd.conf
 fi
 httpd -f /config/httpd.conf
